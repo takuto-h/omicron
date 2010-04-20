@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Omicron
 {
@@ -324,6 +325,9 @@ namespace Omicron
             case TokenType.Def:
                 result = ParseTypeLevelDefinition();
                 break;
+            case TokenType.Dollar:
+                result = ParseObjectType();
+                break;
             default:
                 throw new InvalidOperationException(Expected());
             }
@@ -392,6 +396,49 @@ namespace Omicron
             LookAhead();
             ITypeExpr typeExpr = ParseTypeLevelExpression();
             return new TEDef(typeVarName, typeExpr);
+        }
+        
+        private ITypeExpr ParseObjectType()
+        {
+            var methodSignatureExprs = new HashSet<MethodSignatureExpr>();
+            LookAhead();
+            if (mHeadToken != TokenType.LeftBrace)
+            {
+                throw new InvalidOperationException(Expected("LeftBrace"));
+            }
+            LookAhead();
+            if (mHeadToken != TokenType.RightBrace)
+            {
+                methodSignatureExprs.Add(ParseMethodSignatureExpression());
+                while (mHeadToken == TokenType.Comma)
+                {
+                    LookAhead();
+                    methodSignatureExprs.Add(ParseMethodSignatureExpression());
+                }
+                if (mHeadToken != TokenType.RightBrace)
+                {
+                    throw new InvalidOperationException(Expected("RightBrace"));
+                }
+            }
+            LookAhead();
+            return new TEObj(methodSignatureExprs);
+        }
+        
+        private MethodSignatureExpr ParseMethodSignatureExpression()
+        {
+            if (mHeadToken != TokenType.Identifier)
+            {
+                throw new InvalidOperationException(Expected("Identifier"));
+            }
+            string methodName = (string)mLexer.Value;
+            LookAhead();
+            if (mHeadToken != TokenType.Colon)
+            {
+                throw new InvalidOperationException(Expected("Colon"));
+            }
+            LookAhead();
+            ITypeExpr methodTypeExpr = ParseTypeLevelExpression();
+            return new MethodSignatureExpr(methodName, methodTypeExpr);
         }
         
         private string Expected()

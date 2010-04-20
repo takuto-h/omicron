@@ -12,9 +12,11 @@ namespace Omicron
         
         RightArrow = -7,
         
+        Dollar = 36,
         LeftParen = 40,
         RightParen = 41,
         Asterisk = 42,
+        Comma = 44,
         Minus = 45,
         Colon = 58,
         Semicolon = 59,

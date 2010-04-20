@@ -36,9 +36,11 @@ namespace Omicron
             }
             switch (c)
             {
+            case '$':
             case '(':
             case ')':
             case '*':
+            case ',':
             case ':':
             case ';':
             case '=':
