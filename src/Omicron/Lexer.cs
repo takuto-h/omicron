@@ -72,7 +72,7 @@ namespace Omicron
                 {
                     LexInt();
                 }
-                else if (char.IsLetter((char)c))
+                else if (IsIdentifierStart((char)c))
                 {
                     LexIdentifier();
                 }
@@ -85,6 +85,16 @@ namespace Omicron
                 break;
             }
             return true;
+        }
+        
+        private bool IsIdentifierStart(char c)
+        {
+            return char.IsLetter(c) || c == '_';
+        }
+        
+        private bool IsIdentifierPart(char c)
+        {
+            return char.IsLetterOrDigit(c) || c == '_';
         }
         
         private void LexString()
@@ -126,7 +136,7 @@ namespace Omicron
             StringBuilder sb = new StringBuilder();
             sb.Append((char)mReader.Read());
             int c = mReader.Peek();
-            while (c != -1 && char.IsLetterOrDigit((char)c))
+            while (c != -1 && IsIdentifierPart((char)c))
             {
                 sb.Append((char)mReader.Read());
                 c = mReader.Peek();
