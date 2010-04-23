@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -30,6 +31,20 @@ namespace Omicron
                 methodTypes.Add(kvp.Key, kvp.Value.Eval(unique, type));
             }
             return new TObj(methodTypes);
+        }
+        
+        public IType GetMethodType(string methodName)
+        {
+            IType result;
+            if (!mMethodTypes.TryGetValue(methodName, out result))
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        "undefined method for {0}: {1}", Show(), methodName
+                    )
+                );
+            }
+            return result;
         }
         
         public bool Equals(IType type)

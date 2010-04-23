@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,6 +11,20 @@ namespace Omicron
         public VObj(IDictionary<string, IValue> methodValues)
         {
             mMethodValues = methodValues;
+        }
+        
+        public IValue GetMethodValue(string methodName)
+        {
+            IValue result;
+            if (!mMethodValues.TryGetValue(methodName, out result))
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        "undefined method for {0}: {1}", Show(), methodName
+                    )
+                );
+            }
+            return result;
         }
         
         public string Show()

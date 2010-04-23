@@ -78,7 +78,9 @@ namespace Omicron
             if (func == null)
             {
                 throw new InvalidOperationException(
-                    string.Format("function required, but got {1}", value1)
+                    string.Format(
+                        "function required, but got {0}", value1.Show()
+                    )
                 );
             }
             return func.Apply(value2);
