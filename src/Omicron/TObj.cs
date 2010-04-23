@@ -53,8 +53,20 @@ namespace Omicron
             {
                 return false;
             }
-            return ((TObj)type).mMethodTypes
-              .Except(mMethodTypes).Count() == 0;
+            var methodTypes = ((TObj)type).mMethodTypes;
+            foreach (string methodName in mMethodTypes.Keys)
+            {
+                IType result;
+                if (!methodTypes.TryGetValue(methodName, out result))
+                {
+                    return false;
+                }
+                else if (!result.Equals(mMethodTypes[methodName]))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
         
         public string Show()
