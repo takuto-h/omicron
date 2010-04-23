@@ -1,5 +1,5 @@
+object reader
 ShowEnumerable
 Method..
-object
-Maybe
+Maybe (variant types)
 List (recursive types)
