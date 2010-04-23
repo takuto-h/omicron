@@ -40,6 +40,10 @@ namespace Omicron
         
         public string Show()
         {
+            if (mMethodValueExprs.Count == 0)
+            {
+                return "${}";
+            }
             return string.Format(
                 "${{{0}}}",
                 mMethodValueExprs.Skip(1).Aggregate(

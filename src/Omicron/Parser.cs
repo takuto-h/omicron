@@ -58,7 +58,8 @@ namespace Omicron
         {
             IValueExpr result = ParseAtom();
             while (mHeadToken == TokenType.LeftParen ||
-                   mHeadToken == TokenType.LeftBracket)
+                   mHeadToken == TokenType.LeftBracket ||
+                   mHeadToken == TokenType.Dot)
             {
                 switch (mHeadToken)
                 {
@@ -67,6 +68,9 @@ namespace Omicron
                     break;
                 case TokenType.LeftBracket:
                     result = ParseTypeApplication(result);
+                    break;
+                case TokenType.Dot:
+                    result = ParseObjectReference(result);
                     break;
                 }
             }
@@ -95,6 +99,18 @@ namespace Omicron
             }
             LookAhead();
             return new VETypeApp(function, argument);
+        }
+        
+        private IValueExpr ParseObjectReference(IValueExpr valueExpr)
+        {
+            LookAhead();
+            if (mHeadToken != TokenType.Identifier)
+            {
+                throw new InvalidOperationException(Expected("Identifier"));
+            }
+            string methodName = (string)mLexer.Value;
+            LookAhead();
+            return new VERef(valueExpr, methodName);
         }
         
         private IValueExpr ParseAtom()

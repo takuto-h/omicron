@@ -41,6 +41,7 @@ namespace Omicron
             case ')':
             case '*':
             case ',':
+            case '.':
             case ':':
             case ';':
             case '=':

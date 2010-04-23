@@ -18,6 +18,7 @@ namespace Omicron
         Asterisk = 42,
         Comma = 44,
         Minus = 45,
+        Dot = 46,
         Colon = 58,
         Semicolon = 59,
         Equal = 61,
