@@ -5,25 +5,31 @@ namespace Omicron
 {
     public class TObj : IType
     {
-        private IEnumerable<MethodSignature> mMethodSignatures;
+        private IDictionary<string, IType> mMethodTypes;
         
-        public TObj(IEnumerable<MethodSignature> methodSignatures)
+        public TObj(IDictionary<string, IType> methodTypes)
         {
-            mMethodSignatures = methodSignatures;
+            mMethodTypes = methodTypes;
         }
         
         public IType Replace(Unique unique, IType type)
         {
-            return new TObj(
-                mMethodSignatures.Select(sig => sig.Replace(unique, type))
-            );
+            var methodTypes = new Dictionary<string, IType>();
+            foreach (KeyValuePair<string, IType> kvp in mMethodTypes)
+            {
+                methodTypes.Add(kvp.Key, kvp.Value.Replace(unique, type));
+            }
+            return new TObj(methodTypes);
         }
         
         public IType Eval(Unique unique, IType type)
         {
-            return new TObj(
-                mMethodSignatures.Select(sig => sig.Eval(unique, type))
-            );
+            var methodTypes = new Dictionary<string, IType>();
+            foreach (KeyValuePair<string, IType> kvp in mMethodTypes)
+            {
+                methodTypes.Add(kvp.Key, kvp.Value.Eval(unique, type));
+            }
+            return new TObj(methodTypes);
         }
         
         public bool Equals(IType type)
@@ -32,19 +38,26 @@ namespace Omicron
             {
                 return false;
             }
-            return ((TObj)type).mMethodSignatures
-              .Except(mMethodSignatures).Count() == 0;
+            return ((TObj)type).mMethodTypes
+              .Except(mMethodTypes).Count() == 0;
         }
         
         public string Show()
         {
             return string.Format(
                 "${{{0}}}",
-                mMethodSignatures.Skip(1).Aggregate(
-                    mMethodSignatures.ElementAt(0).Show(),
-                    (acc, elem) => string.Format("{0}, {1}", acc, elem.Show())
+                mMethodTypes.Skip(1).Aggregate(
+                    ShowMethodType(mMethodTypes.ElementAt(0)),
+                    (acc, elem) => string.Format(
+                        "{0}, {1}", acc, ShowMethodType(elem)
+                    )
                 )
             );
+        }
+        
+        private static string ShowMethodType(KeyValuePair<string, IType> kvp)
+        {
+            return string.Format("{0}:{1}", kvp.Key, kvp.Value.Show());
         }
     }
 }

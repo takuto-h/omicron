@@ -5,39 +5,50 @@ namespace Omicron
 {
     public class TEObj : ITypeExpr
     {
-        private IEnumerable<MethodSignatureExpr> mMethodSignatureExprs;
+        private IDictionary<string, ITypeExpr> mMethodTypeExprs;
         
-        public TEObj(IEnumerable<MethodSignatureExpr> methodSignatureExprs)
+        public TEObj(IDictionary<string, ITypeExpr> methodTypeExprs)
         {
-            mMethodSignatureExprs = methodSignatureExprs;
+            mMethodTypeExprs = methodTypeExprs;
         }
         
         public IKind Check(ITypeCtxt typeCtxt)
         {
-            foreach (MethodSignatureExpr sigExpr in mMethodSignatureExprs)
+            foreach (ITypeExpr typeExpr in mMethodTypeExprs.Values)
             {
-                sigExpr.Check(typeCtxt);
+                typeExpr.Check(typeCtxt);
             }
             return KCType.Instance;
         }
         
         public IType Eval(ITypeEnv typeEnv)
         {
-            return new TObj(
-                mMethodSignatureExprs.Select(sigExpr => sigExpr.Eval(typeEnv))
-            );
+            var methodTypes = new Dictionary<string, IType>();
+            foreach (KeyValuePair<string, ITypeExpr> kvp in mMethodTypeExprs)
+            {
+                methodTypes.Add(kvp.Key, kvp.Value.Eval(typeEnv));
+            }
+            return new TObj(methodTypes);
         }
         
         public string Show()
         {
-            
             return string.Format(
                 "${{{0}}}",
-                mMethodSignatureExprs.Skip(1).Aggregate(
-                    mMethodSignatureExprs.ElementAt(0).Show(),
-                    (acc, elem) => string.Format("{0}, {1}", acc, elem.Show())
+                mMethodTypeExprs.Skip(1).Aggregate(
+                    ShowMethodTypeExpr(mMethodTypeExprs.ElementAt(0)),
+                    (acc, elem) => string.Format(
+                        "{0}, {1}", acc, ShowMethodTypeExpr(elem)
+                    )
                 )
             );
+        }
+        
+        private static string ShowMethodTypeExpr(
+            KeyValuePair<string, ITypeExpr> kvp
+        )
+        {
+            return string.Format("{0}:{1}", kvp.Key, kvp.Value.Show());
         }
     }
 }

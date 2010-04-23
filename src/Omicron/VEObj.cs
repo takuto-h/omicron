@@ -5,11 +5,11 @@ namespace Omicron
 {
     public class VEObj : IValueExpr
     {
-        private IEnumerable<MethodStructureExpr> mMethodStructureExprs;
+        private IDictionary<string, IValueExpr> mMethodValueExprs;
         
-        public VEObj(IEnumerable<MethodStructureExpr> methodStructureExprs)
+        public VEObj(IDictionary<string, IValueExpr> methodValueExprs)
         {
-            mMethodStructureExprs = methodStructureExprs;
+            mMethodValueExprs = methodValueExprs;
         }
         
         public IType Check(
@@ -18,31 +18,44 @@ namespace Omicron
             IValueCtxt valueCtxt
         )
         {
-            return new TObj(
-                mMethodStructureExprs.Select(
-                    strExpr => strExpr.Check(typeCtxt, typeEnv, valueCtxt)
-                )
-            );
+            var methodTypes = new Dictionary<string, IType>();
+            foreach (KeyValuePair<string, IValueExpr> kvp in mMethodValueExprs)
+            {
+                methodTypes.Add(
+                    kvp.Key, kvp.Value.Check(typeCtxt, typeEnv, valueCtxt)
+                );
+            }
+            return new TObj(methodTypes);
         }
         
         public IValue Eval(IValueEnv valueEnv)
         {
-            return new VObj(
-                mMethodStructureExprs.Select(
-                    strExpr => strExpr.Eval(valueEnv)
-                ).ToDictionary(str => str.Key, str => str.Value)
-            );
+            var methodValues = new Dictionary<string, IValue>();
+            foreach (KeyValuePair<string, IValueExpr> kvp in mMethodValueExprs)
+            {
+                methodValues.Add(kvp.Key, kvp.Value.Eval(valueEnv));
+            }
+            return new VObj(methodValues);
         }
         
         public string Show()
         {
             return string.Format(
                 "${{{0}}}",
-                mMethodStructureExprs.Skip(1).Aggregate(
-                    mMethodStructureExprs.ElementAt(0).Show(),
-                    (acc, elem) => string.Format("{0}, {1}", acc, elem.Show())
+                mMethodValueExprs.Skip(1).Aggregate(
+                    ShowMethodValueExpr(mMethodValueExprs.ElementAt(0)),
+                    (acc, elem) => string.Format(
+                        "{0}, {1}", acc, ShowMethodValueExpr(elem)
+                    )
                 )
             );
+        }
+        
+        private static string ShowMethodValueExpr(
+            KeyValuePair<string, IValueExpr> kvp
+        )
+        {
+            return string.Format("{0}={1}", kvp.Key, kvp.Value.Show());
         }
     }
 }

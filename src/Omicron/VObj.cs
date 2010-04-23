@@ -5,23 +5,29 @@ namespace Omicron
 {
     public class VObj : IValue
     {
-        private IDictionary<string, IValue> mMethodTable;
+        private IDictionary<string, IValue> mMethodValues;
         
-        public VObj(IDictionary<string, IValue> methodTable)
+        public VObj(IDictionary<string, IValue> methodValues)
         {
-            mMethodTable = methodTable;
+            mMethodValues = methodValues;
         }
         
         public string Show()
         {
-            IEnumerable<string> methodNames = mMethodTable.Keys;
             return string.Format(
                 "${{{0}}}",
-                methodNames.Skip(1).Aggregate(
-                    methodNames.ElementAt(0),
-                    (acc, elem) => string.Format("{0}, {1}", acc, elem)
+                mMethodValues.Skip(1).Aggregate(
+                    ShowMethodValue(mMethodValues.ElementAt(0)),
+                    (acc, elem) => string.Format(
+                        "{0}, {1}", acc, ShowMethodValue(elem)
+                    )
                 )
             );
+        }
+        
+        private static string ShowMethodValue(KeyValuePair<string, IValue> kvp)
+        {
+            return string.Format("{0}={1}", kvp.Key, kvp.Value.Show());
         }
     }
 }

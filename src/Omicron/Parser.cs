@@ -210,7 +210,7 @@ namespace Omicron
         
         private IValueExpr ParseObject()
         {
-            var methodStructureExprs = new HashSet<MethodStructureExpr>();
+            var methodValueExprs = new Dictionary<string, IValueExpr>();
             LookAhead();
             if (mHeadToken != TokenType.LeftBrace)
             {
@@ -219,11 +219,11 @@ namespace Omicron
             LookAhead();
             if (mHeadToken != TokenType.RightBrace)
             {
-                methodStructureExprs.Add(ParseMethodStructureExpression());
+                ParseMethodValueExpression(methodValueExprs);
                 while (mHeadToken == TokenType.Comma)
                 {
                     LookAhead();
-                    methodStructureExprs.Add(ParseMethodStructureExpression());
+                    ParseMethodValueExpression(methodValueExprs);
                 }
                 if (mHeadToken != TokenType.RightBrace)
                 {
@@ -231,10 +231,12 @@ namespace Omicron
                 }
             }
             LookAhead();
-            return new VEObj(methodStructureExprs);
+            return new VEObj(methodValueExprs);
         }
         
-        private MethodStructureExpr ParseMethodStructureExpression()
+        private void ParseMethodValueExpression(
+            IDictionary<string, IValueExpr> methodValueExprs
+        )
         {
             if (mHeadToken != TokenType.Identifier)
             {
@@ -248,7 +250,7 @@ namespace Omicron
             }
             LookAhead();
             IValueExpr methodValueExpr = ParseExpression();
-            return new MethodStructureExpr(methodName, methodValueExpr);
+            methodValueExprs.Add(methodName, methodValueExpr);
         }
         
         private IKind ParseKind()
@@ -446,7 +448,7 @@ namespace Omicron
         
         private ITypeExpr ParseObjectType()
         {
-            var methodSignatureExprs = new HashSet<MethodSignatureExpr>();
+            var methodTypeExprs = new Dictionary<string, ITypeExpr>();
             LookAhead();
             if (mHeadToken != TokenType.LeftBrace)
             {
@@ -455,11 +457,11 @@ namespace Omicron
             LookAhead();
             if (mHeadToken != TokenType.RightBrace)
             {
-                methodSignatureExprs.Add(ParseMethodSignatureExpression());
+                ParseMethodTypeExpression(methodTypeExprs);
                 while (mHeadToken == TokenType.Comma)
                 {
                     LookAhead();
-                    methodSignatureExprs.Add(ParseMethodSignatureExpression());
+                    ParseMethodTypeExpression(methodTypeExprs);
                 }
                 if (mHeadToken != TokenType.RightBrace)
                 {
@@ -467,10 +469,12 @@ namespace Omicron
                 }
             }
             LookAhead();
-            return new TEObj(methodSignatureExprs);
+            return new TEObj(methodTypeExprs);
         }
         
-        private MethodSignatureExpr ParseMethodSignatureExpression()
+        private void ParseMethodTypeExpression(
+            IDictionary<string, ITypeExpr> methodTypeExprs
+        )
         {
             if (mHeadToken != TokenType.Identifier)
             {
@@ -484,7 +488,7 @@ namespace Omicron
             }
             LookAhead();
             ITypeExpr methodTypeExpr = ParseTypeLevelExpression();
-            return new MethodSignatureExpr(methodName, methodTypeExpr);
+            methodTypeExprs.Add(methodName, methodTypeExpr);
         }
         
         private string Expected()
