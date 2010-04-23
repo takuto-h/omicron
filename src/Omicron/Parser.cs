@@ -386,6 +386,9 @@ namespace Omicron
             case TokenType.Poly:
                 result = ParsePoly();
                 break;
+            case TokenType.AtMark:
+                result = ParseForall();
+                break;
             case TokenType.Def:
                 result = ParseTypeLevelDefinition();
                 break;
@@ -398,7 +401,7 @@ namespace Omicron
             return result;
         }
         
-        private ITypeExpr ParseTypeLevelAbstraction()
+        private TEAbs ParseTypeLevelAbstraction()
         {
             LookAhead();
             if (mHeadToken != TokenType.Identifier)
@@ -442,6 +445,13 @@ namespace Omicron
             }
             LookAhead();
             return new TEPoly(kind);
+        }
+        
+        private ITypeExpr ParseForall()
+        {
+            TEAbs typeExprAbs = ParseTypeLevelAbstraction();
+            IKind kind = typeExprAbs.ParameterKind;
+            return new TEApp(new TEPoly(kind), typeExprAbs);
         }
         
         private ITypeExpr ParseTypeLevelDefinition()

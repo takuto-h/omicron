@@ -6,6 +6,11 @@ namespace Omicron
         private IKind mKind;
         private ITypeExpr mTypeExpr;
         
+        public IKind ParameterKind
+        {
+            get { return mKind; }
+        }
+        
         public TEAbs(
             string typeVarName,
             IKind kind,

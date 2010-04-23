@@ -22,6 +22,7 @@ namespace Omicron
         Colon = 58,
         Semicolon = 59,
         Equal = 61,
+        AtMark = 64,
         LeftBracket = 91,
         RightBracket = 93,
         Hat = 94,
