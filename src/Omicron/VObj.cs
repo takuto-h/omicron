@@ -18,7 +18,7 @@ namespace Omicron
             return string.Format(
                 "${{{0}}}",
                 methodNames.Skip(1).Aggregate(
-                    methodNames.ElementAt(1),
+                    methodNames.ElementAt(0),
                     (acc, elem) => string.Format("{0}, {1}", acc, elem)
                 )
             );
