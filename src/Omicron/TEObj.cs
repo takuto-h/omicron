@@ -33,8 +33,8 @@ namespace Omicron
             
             return string.Format(
                 "${{{0}}}",
-                mMethodSignatureExprs.Aggregate(
-                    "",
+                mMethodSignatureExprs.Skip(1).Aggregate(
+                    mMethodSignatureExprs.ElementAt(0).Show(),
                     (acc, elem) => string.Format("{0}, {1}", acc, elem.Show())
                 )
             );
