@@ -123,6 +123,9 @@ namespace Omicron
             case TokenType.Def:
                 result = ParseDefinition();
                 break;
+            case TokenType.Dollar:
+                result = ParseObject();
+                break;
             default:
                 throw new InvalidOperationException(Expected());
             }
@@ -203,6 +206,49 @@ namespace Omicron
             LookAhead();
             IValueExpr valueExpr = ParseExpression();
             return new VEDef(valueVarName, valueExpr);
+        }
+        
+        private IValueExpr ParseObject()
+        {
+            var methodStructureExprs = new HashSet<MethodStructureExpr>();
+            LookAhead();
+            if (mHeadToken != TokenType.LeftBrace)
+            {
+                throw new InvalidOperationException(Expected("LeftBrace"));
+            }
+            LookAhead();
+            if (mHeadToken != TokenType.RightBrace)
+            {
+                methodStructureExprs.Add(ParseMethodStructureExpression());
+                while (mHeadToken == TokenType.Comma)
+                {
+                    LookAhead();
+                    methodStructureExprs.Add(ParseMethodStructureExpression());
+                }
+                if (mHeadToken != TokenType.RightBrace)
+                {
+                    throw new InvalidOperationException(Expected("RightBrace"));
+                }
+            }
+            LookAhead();
+            return new VEObj(methodStructureExprs);
+        }
+        
+        private MethodStructureExpr ParseMethodStructureExpression()
+        {
+            if (mHeadToken != TokenType.Identifier)
+            {
+                throw new InvalidOperationException(Expected("Identifier"));
+            }
+            string methodName = (string)mLexer.Value;
+            LookAhead();
+            if (mHeadToken != TokenType.Equal)
+            {
+                throw new InvalidOperationException(Expected("Equal"));
+            }
+            LookAhead();
+            IValueExpr methodValueExpr = ParseExpression();
+            return new MethodStructureExpr(methodName, methodValueExpr);
         }
         
         private IKind ParseKind()
