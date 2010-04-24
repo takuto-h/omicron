@@ -5,9 +5,9 @@ def Monad=^M:*->*{${fmap:@A:*{@B:*{(A->B)->M(A)->M(B)}},pure:@A:*{A->M(A)},join:
 def just=~A:*{^x:A{${bind_maybe=~B:*{^f:A->B{^g:B{f(x)}}}}}};
 def nothing=~A:*{${bind_maybe=~B:*{^f:A->B{^g:B{g}}}}};
 def maybe_monad=${fmap=~A:*{~B:*{^f:A->B{^m:Maybe(A){m.bind_maybe[Maybe(B)](^x:A{just[B](f(x))})(nothing[B])}}}},pure=just,join=~A:*{^m:Maybe(Maybe(A)){m.bind_maybe[Maybe(A)](^x:Maybe(A){x})(nothing[A])}}};
-def bind=~M:*->*{~A:*{~B:*{^monad:Monad(M){^m:M(A){^f:A->M(B){monad.join[B](monad.fmap[A][M(B)](f)(m))}}}}}};
+def bind=~M:*->*{^monad:Monad(M){~A:*{^m:M(A){~B:*{^f:A->M(B){monad.join[B](monad.fmap[A][M(B)](f)(m))}}}}}};
 
-bind[Maybe][Int][Int](maybe_monad)(just[Int](123))(^x:Int{just[Int](x)}).bind_maybe[Int](^x:Int{x})(0);
+bind[Maybe](maybe_monad)[Int](just[Int](123))[Int](^x:Int{just[Int](x)}).bind_maybe[Int](^x:Int{x})(0);
 
 ----
 
@@ -46,12 +46,13 @@ def maybe_monad = ${
   }
 }
 
-def bind = ~M:*->*{~A:*{~B:*{
-  ^monad:Monad(M){^m:M(A){^f:A->M(B){
+def bind = ~M:*->*{^monad:Monad(M){
+  ~A:*{^m:M(A){~B:*{^f:A->M(B){
     monad.join[B](monad.fmap[A][M(B)](f)(m))
-  }}}
-}}};
+  }}}}
+}};
 
-bind[Maybe][Int][Int]
-    (maybe_monad)(just[Int](123))(^x:Int{just[Int](x)})
+bind[Maybe](maybe_monad)
+    [Int](just[Int](123))
+    [Int](^x:Int{just[Int](x)})
   .bind_maybe[Int](^x:Int{x})(0);

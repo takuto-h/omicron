@@ -53,18 +53,25 @@ namespace Omicron
             {
                 return false;
             }
-            var methodTypes = ((TObj)type).mMethodTypes;
-            foreach (string methodName in mMethodTypes.Keys)
+            var methodTypes = new Dictionary<string, IType>(
+                ((TObj)type).mMethodTypes
+            );
+            foreach (KeyValuePair<string, IType> kvp in mMethodTypes)
             {
                 IType result;
-                if (!methodTypes.TryGetValue(methodName, out result))
+                if (!methodTypes.TryGetValue(kvp.Key, out result))
                 {
                     return false;
                 }
-                else if (!result.Equals(mMethodTypes[methodName]))
+                else if (!result.Equals(kvp.Value))
                 {
                     return false;
                 }
+                methodTypes.Remove(kvp.Key);
+            }
+            if (methodTypes.Count != 0)
+            {
+                return false;
             }
             return true;
         }
