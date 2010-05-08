@@ -10,8 +10,10 @@ namespace Omicron
         Poly = -5,
         Rec = -6,
         Def = -7,
+        Fold = -8,
+        Unfold = -9,
         
-        RightArrow = -8,
+        RightArrow = -10,
         
         Dollar = 36,
         LeftParen = 40,
