@@ -11,10 +11,7 @@ namespace Omicron
         
         public IKind Check(ITypeCtxt typeCtxt)
         {
-            return new KArrow(
-                new KArrow(mKind, KCType.Instance),
-                KCType.Instance
-            );
+            return new KArrow(new KArrow(mKind, mKind), mKind);
         }
         
         public IType Eval(ITypeEnv typeEnv)
