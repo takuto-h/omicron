@@ -13,6 +13,7 @@ namespace Omicron
         {
             mReserved = new Dictionary<string, TokenType>();
             mReserved.Add("Poly", TokenType.Poly);
+            mReserved.Add("Rec", TokenType.Rec);
             mReserved.Add("def", TokenType.Def);
         }
         

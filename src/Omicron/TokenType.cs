@@ -8,9 +8,10 @@ namespace Omicron
         Identifier = -4,
         
         Poly = -5,
-        Def = -6,
+        Rec = -6,
+        Def = -7,
         
-        RightArrow = -7,
+        RightArrow = -8,
         
         Dollar = 36,
         LeftParen = 40,
