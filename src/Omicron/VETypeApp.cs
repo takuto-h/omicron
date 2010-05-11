@@ -50,7 +50,7 @@ namespace Omicron
             }
             throw new ArgumentException(
                 string.Format(
-                    "{0} doesn't have a polymorphic ype", mValueExpr.Show()
+                    "{0} doesn't have a polymorphic type", mValueExpr.Show()
                 )
             );
         }
