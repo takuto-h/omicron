@@ -15,6 +15,13 @@ namespace Omicron
                     new KArrow(KCType.Instance, KCType.Instance)
                 )
             );
+            Add(
+                "Rec",
+                new KArrow(
+                    new KArrow(KCType.Instance, KCType.Instance),
+                    KCType.Instance
+                )
+            );
         }
         
         public ITypeCtxt MakeChild()

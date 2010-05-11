@@ -9,6 +9,7 @@ namespace Omicron
             Add("Int", TCInt.Instance);
             Add("String", TCString.Instance);
             Add("Func", TCFunc.Instance);
+            Add("Rec", TCRec.Instance);
         }
         
         public ITypeEnv MakeChild()

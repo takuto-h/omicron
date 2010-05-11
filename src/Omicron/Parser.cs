@@ -426,9 +426,6 @@ namespace Omicron
             case TokenType.Dollar:
                 result = ParseObjectType();
                 break;
-            case TokenType.Rec:
-                result = ParseRec();
-                break;
             default:
                 throw new InvalidOperationException(Expected());
             }
@@ -549,23 +546,6 @@ namespace Omicron
             LookAhead();
             ITypeExpr methodTypeExpr = ParseTypeLevelExpression();
             methodTypeExprs.Add(methodName, methodTypeExpr);
-        }
-        
-        private ITypeExpr ParseRec()
-        {
-            LookAhead();
-            if (mHeadToken != TokenType.LeftBracket)
-            {
-                throw new InvalidOperationException(Expected("LeftBracket"));
-            }
-            LookAhead();
-            IKind kind = ParseKind();
-            if (mHeadToken != TokenType.RightBracket)
-            {
-                throw new InvalidOperationException(Expected("RightBracket"));
-            }
-            LookAhead();
-            return new TERec(kind);
         }
         
         private string Expected()
