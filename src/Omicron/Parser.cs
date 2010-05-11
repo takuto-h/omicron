@@ -142,6 +142,9 @@ namespace Omicron
             case TokenType.Dollar:
                 result = ParseObject();
                 break;
+            case TokenType.Fold:
+                result = ParseFold();
+                break;
             default:
                 throw new InvalidOperationException(Expected());
             }
@@ -267,6 +270,32 @@ namespace Omicron
             LookAhead();
             IValueExpr methodValueExpr = ParseExpression();
             methodValueExprs.Add(methodName, methodValueExpr);
+        }
+        
+        private IValueExpr ParseFold()
+        {
+            LookAhead();
+            if (mHeadToken != TokenType.LeftBracket)
+            {
+                throw new InvalidOperationException(Expected("LeftBracket"));
+            }
+            ITypeExpr typeExpr = ParseTypeLevelExpression();
+            if (mHeadToken != TokenType.RightBracket)
+            {
+                throw new InvalidOperationException(Expected("RightBracket"));
+            }
+            LookAhead();
+            if (mHeadToken != TokenType.LeftParen)
+            {
+                throw new InvalidOperationException(Expected("LeftParen"));
+            }
+            IValueExpr valueExpr = ParseExpression();
+            if (mHeadToken != TokenType.RightParen)
+            {
+                throw new InvalidOperationException(Expected("RightParen"));
+            }
+            LookAhead();
+            return new VEFold(typeExpr, valueExpr);
         }
         
         private IKind ParseKind()
