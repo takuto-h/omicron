@@ -1,0 +1,7 @@
+:t
+def List=^A:*{Rec(^LA:*{${bind_list:@B:*{B->(A->LA->B)->B}}})};
+:v
+def nil=~A:*{fold[List(A)](${bind_list=~B:*{^f:B{^g:A->List(A)->B{f}}}})};
+def cons=~A:*{^x:A{^xs:List(A){fold[List(A)](${bind_list=~B:*{^f:B{^g:A->List(A)->B{g(x)(xs)}}}})}}};
+
+cons[Int](1)(nil[Int]);
