@@ -279,6 +279,7 @@ namespace Omicron
             {
                 throw new InvalidOperationException(Expected("LeftBracket"));
             }
+            LookAhead();
             ITypeExpr typeExpr = ParseTypeLevelExpression();
             if (mHeadToken != TokenType.RightBracket)
             {
@@ -289,6 +290,7 @@ namespace Omicron
             {
                 throw new InvalidOperationException(Expected("LeftParen"));
             }
+            LookAhead();
             IValueExpr valueExpr = ParseExpression();
             if (mHeadToken != TokenType.RightParen)
             {

@@ -23,6 +23,16 @@ namespace Omicron
             return new TObj(methodTypes);
         }
         
+        public IType Rename()
+        {
+            var methodTypes = new Dictionary<string, IType>();
+            foreach (KeyValuePair<string, IType> kvp in mMethodTypes)
+            {
+                methodTypes.Add(kvp.Key, kvp.Value.Rename());
+            }
+            return new TObj(methodTypes);
+        }
+        
         public IType Eval(Unique unique, IType type)
         {
             var methodTypes = new Dictionary<string, IType>();

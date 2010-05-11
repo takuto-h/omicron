@@ -54,6 +54,11 @@ namespace Omicron
             );
         }
         
+        public IType Rename()
+        {
+            return new TApp(mType1.Rename(), mType2.Rename());
+        }
+        
         public string Show()
         {
             if (mType1 is TApp)

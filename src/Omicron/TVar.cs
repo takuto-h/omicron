@@ -42,6 +42,11 @@ namespace Omicron
             }
         }
         
+        public IType Rename()
+        {
+            return this;
+        }
+        
         public string Show()
         {
             return mUnique.Show();

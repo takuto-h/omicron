@@ -27,6 +27,8 @@ namespace Omicron
             );
             if (!valueExprType.Equals(unrolledType))
             {
+                Console.WriteLine(valueExprType.Show());
+                Console.WriteLine(unrolledType.Show());
                 throw new InvalidOperationException(
                     string.Format(
                         "{0} cannot be folded with the type {1}",
@@ -42,7 +44,7 @@ namespace Omicron
         {
             /*
             (TApp TCRec (TAbs unique type3)) = type
-            return UnrollRecursiveType(type3, unique, type);
+            return UnrollRecursiveType(type3, unique);
             */
             if (type is TApp)
             {
@@ -54,7 +56,7 @@ namespace Omicron
                     {
                         Unique unique = ((TAbs)type2).Parameter;
                         IType type3 = ((TAbs)type2).Body;
-                        return type3.Replace(unique, type);
+                        return UnrollRecursiveType(type3, unique);
                     }
                 }
             }
@@ -63,6 +65,18 @@ namespace Omicron
                     "{0} is not a recursive type", mTypeExpr.Show()
                 )
             );
+        }
+        
+        private IType UnrollRecursiveType(IType body, Unique unique)
+        {
+            return body.Replace(
+                unique, MakeRecursiveType(unique, body.Rename())
+            );
+        }
+        
+        private IType MakeRecursiveType(Unique unique, IType type)
+        {
+            return new TApp(TCRec.Instance, new TAbs(unique, type));
         }
         
         public IValue Eval(IValueEnv valueEnv)

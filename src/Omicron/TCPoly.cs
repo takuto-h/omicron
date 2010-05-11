@@ -33,6 +33,11 @@ namespace Omicron
             return this;
         }
         
+        public IType Rename()
+        {
+            return this;
+        }
+        
         public string Show()
         {
             return string.Format("Poly[{0}]", mKind.Show());

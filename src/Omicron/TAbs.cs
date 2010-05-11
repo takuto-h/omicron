@@ -39,13 +39,21 @@ namespace Omicron
             }
             Unique unique2 = ((TAbs)type).mUnique;
             IType type2 = ((TAbs)type).mType;
-            return mUnique == unique2
-              || mType.Replace(mUnique, new TVar(unique2)).Equals(type2);
+            return mType.Replace(mUnique, new TVar(unique2)).Equals(type2);
         }
         
         public IType Replace(Unique unique, IType type)
         {
             return new TAbs(mUnique, mType.Replace(unique, type));
+        }
+        
+        public IType Rename()
+        {
+            Unique newUnique = new Unique();
+            return new TAbs(
+                newUnique,
+                mType.Replace(mUnique, new TVar(newUnique)).Rename()
+            );
         }
         
         public string Show()
