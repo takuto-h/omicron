@@ -145,6 +145,9 @@ namespace Omicron
             case TokenType.Fold:
                 result = ParseFold();
                 break;
+            case TokenType.Unfold:
+                result = ParseUnfold();
+                break;
             default:
                 throw new InvalidOperationException(Expected());
             }
@@ -298,6 +301,34 @@ namespace Omicron
             }
             LookAhead();
             return new VEFold(typeExpr, valueExpr);
+        }
+        
+        private IValueExpr ParseUnfold()
+        {
+            LookAhead();
+            if (mHeadToken != TokenType.LeftBracket)
+            {
+                throw new InvalidOperationException(Expected("LeftBracket"));
+            }
+            LookAhead();
+            ITypeExpr typeExpr = ParseTypeLevelExpression();
+            if (mHeadToken != TokenType.RightBracket)
+            {
+                throw new InvalidOperationException(Expected("RightBracket"));
+            }
+            LookAhead();
+            if (mHeadToken != TokenType.LeftParen)
+            {
+                throw new InvalidOperationException(Expected("LeftParen"));
+            }
+            LookAhead();
+            IValueExpr valueExpr = ParseExpression();
+            if (mHeadToken != TokenType.RightParen)
+            {
+                throw new InvalidOperationException(Expected("RightParen"));
+            }
+            LookAhead();
+            return new VEUnfold(typeExpr, valueExpr);
         }
         
         private IKind ParseKind()
