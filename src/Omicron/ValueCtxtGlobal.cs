@@ -6,6 +6,7 @@ namespace Omicron
     {
         public ValueCtxtGlobal()
         {
+            Add("unit", TCUnit.Instance);
         }
         
         public IValueCtxt MakeChild()

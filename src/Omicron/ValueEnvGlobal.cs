@@ -6,6 +6,7 @@ namespace Omicron
     {
         public ValueEnvGlobal()
         {
+            Add("unit", VCUnit.Instance);
         }
         
         public IValueEnv MakeChild()
