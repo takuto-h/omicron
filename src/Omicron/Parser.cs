@@ -40,8 +40,6 @@ namespace Omicron
             IValueExpr result = ParseExpression();
             switch (mHeadToken)
             {
-            case TokenType.EOF:
-                break;
             case TokenType.Semicolon:
                 LookAhead();
                 break;
@@ -392,8 +390,6 @@ namespace Omicron
             ITypeExpr result = ParseTypeLevelExpression();
             switch (mHeadToken)
             {
-            case TokenType.EOF:
-                break;
             case TokenType.Semicolon:
                 LookAhead();
                 break;
