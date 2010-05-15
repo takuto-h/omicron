@@ -1,5 +1,4 @@
 rewrite Program.cs
-omicron-init.om
 map
 list monad
 VEFold.Unroll

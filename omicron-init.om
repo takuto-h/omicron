@@ -1,0 +1,2 @@
+def id = ~A:*{^x:A{x}};
+def const = ~A:*{~B:*{^x:A{^y:B{x}}}};
