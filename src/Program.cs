@@ -32,6 +32,13 @@ class Program
             {
                 break;
             }
+            else if (input == ":l")
+            {
+                Console.Write("l> ");
+                string fileName = Console.ReadLine();
+                Load(fileName, typeCtxt, typeEnv, valueCtxt, valueEnv);
+                continue;
+            }
             else if (input == ":v")
             {
                 valueMode = true;
@@ -77,6 +84,43 @@ class Program
                             "- : {0} = {1}", kind.Show(), type.Show()
                         );
                     }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ERROR: {0}", e.Message);
+            }
+        }
+    }
+    
+    private static void Load(
+        string fileName,
+        ITypeCtxt typeCtxt,
+        ITypeEnv typeEnv,
+        IValueCtxt valueCtxt,
+        IValueEnv valueEnv
+    )
+    {
+        if (fileName == "" || !File.Exists(fileName))
+        {
+            Console.Error.WriteLine("file not found: {0}", fileName);
+            return;
+        }
+        using (TextReader reader = new StreamReader(fileName))
+        {
+            try
+            {
+                Lexer lexer = new Lexer(reader);
+                Parser parser = new Parser(lexer);
+                while (true)
+                {
+                    IValueExpr valueExpr = parser.ParseValueExpr();
+                    if (valueExpr == null)
+                    {
+                        break;
+                    }
+                    valueExpr.Check(typeCtxt, typeEnv, valueCtxt);
+                    valueExpr.Eval(valueEnv);
                 }
             }
             catch (Exception e)
