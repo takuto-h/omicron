@@ -50,45 +50,17 @@ class Program
                 continue;
             }
             TextReader reader = new StringReader(input);
-            try
+            if (valueMode)
             {
-                Lexer lexer = new Lexer(reader);
-                Parser parser = new Parser(lexer);
-                while (true)
-                {
-                    if (valueMode)
-                    {
-                        IValueExpr valueExpr = parser.ParseValueExpr();
-                        if (valueExpr == null)
-                        {
-                            break;
-                        }
-                        IType type = valueExpr.Check(
-                            typeCtxt, typeEnv, valueCtxt
-                        );
-                        IValue value = valueExpr.Eval(valueEnv);
-                        Console.WriteLine(
-                            "- : {0} = {1}", type.Show(), value.Show()
-                        );
-                    }
-                    else
-                    {
-                        ITypeExpr typeExpr = parser.ParseTypeExpr();
-                        if (typeExpr == null)
-                        {
-                            break;
-                        }
-                        IKind kind = typeExpr.Check(typeCtxt);
-                        IType type = typeExpr.Eval(typeEnv);
-                        Console.WriteLine(
-                            "- : {0} = {1}", kind.Show(), type.Show()
-                        );
-                    }
-                }
+                InterpretValueExpr(
+                    reader, true, typeCtxt, typeEnv, valueCtxt, valueEnv
+                );
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine("ERROR: {0}", e.Message);
+                InterpretTypeExpr(
+                    reader, true, typeCtxt, typeEnv
+                );
             }
         }
     }
@@ -101,32 +73,90 @@ class Program
         IValueEnv valueEnv
     )
     {
-        if (fileName == "" || !File.Exists(fileName))
+        if (fileName == "")
+        {
+            return;
+        }
+        else if (!File.Exists(fileName))
         {
             Console.Error.WriteLine("file not found: {0}", fileName);
             return;
         }
         using (TextReader reader = new StreamReader(fileName))
         {
-            try
+            InterpretValueExpr(
+                reader, false, typeCtxt, typeEnv, valueCtxt, valueEnv
+            );
+        }
+    }
+    
+    private static void InterpretValueExpr(
+        TextReader reader,
+        bool interactive,
+        ITypeCtxt typeCtxt,
+        ITypeEnv typeEnv,
+        IValueCtxt valueCtxt,
+        IValueEnv valueEnv
+    )
+    {
+        try
+        {
+            Lexer lexer = new Lexer(reader);
+            Parser parser = new Parser(lexer);
+            while (true)
             {
-                Lexer lexer = new Lexer(reader);
-                Parser parser = new Parser(lexer);
-                while (true)
+                IValueExpr valueExpr = parser.ParseValueExpr();
+                if (valueExpr == null)
                 {
-                    IValueExpr valueExpr = parser.ParseValueExpr();
-                    if (valueExpr == null)
-                    {
-                        break;
-                    }
-                    valueExpr.Check(typeCtxt, typeEnv, valueCtxt);
-                    valueExpr.Eval(valueEnv);
+                    break;
+                }
+                IType type = valueExpr.Check(typeCtxt, typeEnv, valueCtxt);
+                IValue value = valueExpr.Eval(valueEnv);
+                if (interactive)
+                {
+                    Console.WriteLine(
+                        "- : {0} = {1}", type.Show(), value.Show()
+                    );
                 }
             }
-            catch (Exception e)
+        }
+        catch (Exception e)
+        {
+            Console.Error.WriteLine("ERROR: {0}", e.Message);
+        }
+    }
+    
+    private static void InterpretTypeExpr(
+        TextReader reader,
+        bool interactive,
+        ITypeCtxt typeCtxt,
+        ITypeEnv typeEnv
+    )
+    {
+        try
+        {
+            Lexer lexer = new Lexer(reader);
+            Parser parser = new Parser(lexer);
+            while (true)
             {
-                Console.WriteLine("ERROR: {0}", e.Message);
+                ITypeExpr typeExpr = parser.ParseTypeExpr();
+                if (typeExpr == null)
+                {
+                    break;
+                }
+                IKind kind = typeExpr.Check(typeCtxt);
+                IType type = typeExpr.Eval(typeEnv);
+                if (interactive)
+                {
+                    Console.WriteLine(
+                        "- : {0} = {1}", kind.Show(), type.Show()
+                    );
+                }
             }
+        }
+        catch (Exception e)
+        {
+            Console.Error.WriteLine("ERROR: {0}", e.Message);
         }
     }
     
