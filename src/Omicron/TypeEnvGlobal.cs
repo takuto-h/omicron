@@ -6,6 +6,7 @@ namespace Omicron
     {
         public TypeEnvGlobal()
         {
+            Add("Unit", TCUnit.Instance);
             Add("Int", TCInt.Instance);
             Add("String", TCString.Instance);
             Add("Func", TCFunc.Instance);

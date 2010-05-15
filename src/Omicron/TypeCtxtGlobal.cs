@@ -6,6 +6,7 @@ namespace Omicron
     {
         public TypeCtxtGlobal()
         {
+            Add("Unit", KCType.Instance);
             Add("Int", KCType.Instance);
             Add("String", KCType.Instance);
             Add(
