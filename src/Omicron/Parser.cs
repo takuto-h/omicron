@@ -150,6 +150,9 @@ namespace Omicron
             case TokenType.Unfold:
                 result = ParseUnfold();
                 break;
+            case TokenType.Type:
+                result = ParseType();
+                break;
             default:
                 throw new InvalidOperationException(Expected());
             }
@@ -331,6 +334,12 @@ namespace Omicron
             }
             LookAhead();
             return new VEUnfold(typeExpr, valueExpr);
+        }
+        
+        private IValueExpr ParseType()
+        {
+            LookAhead();
+            return new VEType(ParseTypeLevelExpression());
         }
         
         private IKind ParseKind()

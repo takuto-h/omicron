@@ -16,6 +16,7 @@ namespace Omicron
             mReserved.Add("def", TokenType.Def);
             mReserved.Add("fold", TokenType.Fold);
             mReserved.Add("unfold", TokenType.Unfold);
+            mReserved.Add("type", TokenType.Type);
         }
         
         private TextReader mReader;

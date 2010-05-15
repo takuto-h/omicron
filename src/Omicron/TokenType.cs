@@ -11,8 +11,9 @@ namespace Omicron
         Def = -6,
         Fold = -7,
         Unfold = -8,
+        Type = -9,
         
-        RightArrow = -9,
+        RightArrow = -10,
         
         Dollar = 36,
         LeftParen = 40,
