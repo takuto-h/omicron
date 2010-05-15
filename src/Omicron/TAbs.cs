@@ -28,7 +28,7 @@ namespace Omicron
         
         public IType Apply(IType type)
         {
-            return mType.Eval(mUnique, type);
+            return mType.Eval(mUnique, type).Rename();
         }
         
         public bool Equals(IType type)
