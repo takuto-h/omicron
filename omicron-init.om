@@ -1,32 +1,44 @@
+# polymorphic functions
 def id = ~A:*{^x:A{x}};
 def const = ~A:*{~B:*{^x:A{^y:B{x}}}};
+
+# fixed point combinator
 def tri = ~A:*{~B:*{
   ^f:(A->B)->(A->B){^x:Rec(^T:*{T->(A->B)}){
     f(^y:A{unfold[Rec(^T:*{T->(A->B)})](x)(x)(y)})
   }}
 }};
-
 def fix = ~A:*{~B:*{
   ^f:(A->B)->(A->B){
     tri[A][B](f)(fold[Rec(^T:*{T->(A->B)})](tri[A][B](f)))
   }
 }};
+
+# hungry function
+# unfold[Hungry](..(unfold[Hungry](hungry_func(0)))(1)))..) : Hungry
 type def Hungry = Rec(^T:*{Int->T});
 def hungry_func = fix[Int][Hungry](
   ^f:Int->Hungry{^x:Int{
     fold[Hungry](f)
   }}
 );
-unfold[Hungry](unfold[Hungry](hungry_func(1))(2))(3);
 
-type def Maybe = ^A:*{
-  ${ bind_maybe : @B:*{(A->B)->B->B} }
-};
+# Monad
 type def Monad = ^M:*->*{
   ${ fmap : @A:*{@B:*{(A->B)->M(A)->M(B)}}
   ,  pure : @A:*{A->M(A)}
   ,  join : @A:*{M(M(A))->M(A)}
   }
+};
+def bind = ~M:*->*{~A:*{~B:*{
+  ^monad:Monad(M){^m:M(A){^f:A->M(B){
+    monad.join[B](monad.fmap[A][M(B)](f)(m))
+  }}}
+}}};
+
+# Maybe
+type def Maybe = ^A:*{
+  ${ bind_maybe : @B:*{(A->B)->B->B} }
 };
 def just = ~A:*{
   ^x:A{
@@ -53,12 +65,8 @@ def maybe_monad = ${
     }
   }
 };
-def bind = ~M:*->*{~A:*{~B:*{
-  ^monad:Monad(M){^m:M(A){^f:A->M(B){
-    monad.join[B](monad.fmap[A][M(B)](f)(m))
-  }}}
-}}};
 
+# List
 type def List = ^A:*{
   Rec(^LA:*{
     ${ bind_list : @B:*{B->(A->LA->B)->B} }
