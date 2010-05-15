@@ -33,12 +33,13 @@ namespace Omicron
         {
             SkipWhiteSpace();
             int c = mReader.Peek();
-            if (c == -1)
-            {
-                return false;
-            }
             switch (c)
             {
+            case -1:
+                return false;
+            case '#':
+                SkipLineComment();
+                return Advance();
             case '$':
             case '(':
             case ')':
@@ -163,6 +164,16 @@ namespace Omicron
         {
             int c = mReader.Peek();
             while (c != -1 && char.IsWhiteSpace((char)c))
+            {
+                mReader.Read();
+                c = mReader.Peek();
+            }
+        }
+        
+        private void SkipLineComment()
+        {
+            int c = mReader.Peek();
+            while (c != -1 && c != '\n')
             {
                 mReader.Read();
                 c = mReader.Peek();
