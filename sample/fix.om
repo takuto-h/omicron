@@ -1,0 +1,17 @@
+def tri = ~A:*{~B:*{
+  ^f:(A->B)->(A->B){^x:Rec(^T:*{T->(A->B)}){
+    f(^y:A{unfold[Rec(^T:*{T->(A->B)})](x)(x)(y)})
+  }}
+}};
+def fix = ~A:*{~B:*{
+  ^f:(A->B)->(A->B){
+    tri[A][B](f)(fold[Rec(^T:*{T->(A->B)})](tri[A][B](f)))
+  }
+}};
+type def Hungry = Rec(^T:*{Int->T});
+def hungry_func = fix[Int][Hungry](
+  ^f:Int->Hungry{^x:Int{
+    fold[Hungry](f)
+  }}
+);
+unfold[Hungry](unfold[Hungry](hungry_func(1))(2))(3)

@@ -1,6 +1,7 @@
 rewrite Program.cs
+omicron-init.om
+map
 list monad
-fix
 VEFold.Unroll
 efficient IType.Rename (singly-linked list)
 primitive functions
