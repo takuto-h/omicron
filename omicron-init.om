@@ -84,3 +84,42 @@ def cons = ~A:*{
     )
   }}
 };
+def map = ~A:*{~B:*{
+  fix[A->B][List(A)->List(B)](
+    ^map:(A->B)->List(A)->List(B){
+      ^f:A->B{^lst:List(A){
+        unfold[List(A)](lst).bind_list[List(B)]
+          (nil[B])
+          (^x:A{^xs:List(A){cons[B](f(x))(map(f)(xs))}})
+      }}
+    }
+  )
+}};
+def foldr = ~A:*{~B:*{
+  fix[A->B->B][B->List(A)->B](
+    ^foldr:(A->B->B)->B->List(A)->B{
+      ^f:A->B->B{^z:B{^lst:List(A){
+        unfold[List(A)](lst).bind_list[B]
+          (z)
+          (^x:A{^xs:List(A){f(x)(foldr(f)(z)(xs))}})
+      }}}
+    }
+  )
+}};
+def append = ~A:*{
+  fix[List(A)][List(A)->List(A)](
+    ^append:List(A)->List(A)->List(A){
+      ^lst1:List(A){^lst2:List(A){
+        unfold[List(A)](lst1).bind_list[List(A)]
+          (lst2)
+          (^x:A{^xs:List(A){cons[A](x)(append(xs)(lst2))}})
+      }}
+    }
+  )
+};
+def concat = ~A:*{foldr[List(A)][List(A)](append[A])(nil[A])};
+def list_monad = ${
+  fmap = map,
+  pure = ~A:*{^x:A{cons[A](x)(nil[A])}},
+  join = concat
+};
