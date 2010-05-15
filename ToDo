@@ -1,4 +1,5 @@
 pretty printer
+implicit fold/unfold
 VEFold.Unroll
 efficient IType.Rename (singly-linked list)
 primitive functions
