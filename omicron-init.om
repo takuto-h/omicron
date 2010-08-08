@@ -3,14 +3,14 @@ def id = ~A:*{^x:A{x}};
 def const = ~A:*{~B:*{^x:A{^y:B{x}}}};
 
 # fixed point combinator
-def tri = ~A:*{~B:*{
+def delta = ~A:*{~B:*{
   ^f:(A->B)->(A->B){^x:Rec(^T:*{T->(A->B)}){
     f(^y:A{unfold[Rec(^T:*{T->(A->B)})](x)(x)(y)})
   }}
 }};
 def fix = ~A:*{~B:*{
   ^f:(A->B)->(A->B){
-    tri[A][B](f)(fold[Rec(^T:*{T->(A->B)})](tri[A][B](f)))
+    delta[A][B](f)(fold[Rec(^T:*{T->(A->B)})](delta[A][B](f)))
   }
 }};
 
@@ -18,18 +18,19 @@ def fix = ~A:*{~B:*{
 # unfold[Hungry](..(unfold[Hungry](hungry_func(0)))(1)))..) : Hungry
 type def Hungry = Rec(^T:*{Int->T});
 def hungry_func = fix[Int][Hungry](
-  ^f:Int->Hungry{^x:Int{
-    fold[Hungry](f)
-  }}
+  ^hungry_func:Int->Hungry{
+    ^x:Int{
+      fold[Hungry](hungry_func)
+    }
+  }
 );
 
 # Monad
-type def Monad = ^M:*->*{
-  ${ fmap : @A:*{@B:*{(A->B)->M(A)->M(B)}}
-  ,  pure : @A:*{A->M(A)}
-  ,  join : @A:*{M(M(A))->M(A)}
-  }
-};
+type def Monad = ^M:*->*{${
+  fmap:@A:*{@B:*{(A->B)->M(A)->M(B)}},
+  pure:@A:*{A->M(A)},
+  join:@A:*{M(M(A))->M(A)}
+}};
 def bind = ~M:*->*{~A:*{~B:*{
   ^monad:Monad(M){^m:M(A){^f:A->M(B){
     monad.join[B](monad.fmap[A][M(B)](f)(m))
@@ -37,60 +38,46 @@ def bind = ~M:*->*{~A:*{~B:*{
 }}};
 
 # Maybe
-type def Maybe = ^A:*{
-  ${ bind_maybe : @B:*{(A->B)->B->B} }
-};
+type def Maybe = ^A:*{@B:*{(A->B)->B->B}};
 def just = ~A:*{
   ^x:A{
-    ${ bind_maybe = ~B:*{^f:A->B{^g:B{f(x)}}} }
+    ~B:*{^f:A->B{^g:B{f(x)}}}
   }
 };
 def nothing = ~A:*{
-  ${ bind_maybe = ~B:*{^f:A->B{^g:B{g}}} }
+  ~B:*{^f:A->B{^g:B{g}}}
 };
 def maybe_monad = ${
-  fmap = ~A:*{~B:*{
+  fmap=~A:*{~B:*{
     ^f:A->B{^m:Maybe(A){
-      m.bind_maybe[Maybe(B)]
-        (^x:A{just[B](f(x))})
-        (nothing[B])
+      m[Maybe(B)](^x:A{just[B](f(x))})(nothing[B])
     }}
   }},
-  pure = just,
-  join = ~A:*{
-    ^m:Maybe(Maybe(A)){
-      m.bind_maybe[Maybe(A)]
-        (^x:Maybe(A){x})
-        (nothing[A])
+  pure=just,
+  join=~A:*{
+    ^m1:Maybe(Maybe(A)){
+      m1[Maybe(A)](^m2:Maybe(A){m2})(nothing[A])
     }
   }
 };
 
 # List
-type def List = ^A:*{
-  Rec(^LA:*{
-    ${ bind_list : @B:*{B->(A->LA->B)->B} }
-  })
-};
-def nil = ~A:*{
-  fold[List(A)](
-    ${ bind_list = ~B:*{^f:B{^g:A->List(A)->B{f}}} }
-  )
-};
+type def List = ^A:*{Rec(^LA:*{@B:*{(A->LA->B)->B->B}})};
 def cons = ~A:*{
   ^x:A{^xs:List(A){
-    fold[List(A)](
-      ${ bind_list = ~B:*{^f:B{^g:A->List(A)->B{g(x)(xs)}}}}
-    )
+    fold[List(A)](~B:*{^f:A->List(A)->B{^g:B{f(x)(xs)}}})
   }}
+};
+def nil = ~A:*{
+  fold[List(A)](~B:*{^f:A->List(A)->B{^g:B{g}}})
 };
 def map = ~A:*{~B:*{
   fix[A->B][List(A)->List(B)](
     ^map:(A->B)->List(A)->List(B){
       ^f:A->B{^lst:List(A){
-        unfold[List(A)](lst).bind_list[List(B)]
-          (nil[B])
+        unfold[List(A)](lst)[List(B)]
           (^x:A{^xs:List(A){cons[B](f(x))(map(f)(xs))}})
+          (nil[B])
       }}
     }
   )
@@ -99,9 +86,9 @@ def foldr = ~A:*{~B:*{
   fix[A->B->B][B->List(A)->B](
     ^foldr:(A->B->B)->B->List(A)->B{
       ^f:A->B->B{^z:B{^lst:List(A){
-        unfold[List(A)](lst).bind_list[B]
-          (z)
+        unfold[List(A)](lst)[B]
           (^x:A{^xs:List(A){f(x)(foldr(f)(z)(xs))}})
+          (z)
       }}}
     }
   )
@@ -110,9 +97,9 @@ def append = ~A:*{
   fix[List(A)][List(A)->List(A)](
     ^append:List(A)->List(A)->List(A){
       ^lst1:List(A){^lst2:List(A){
-        unfold[List(A)](lst1).bind_list[List(A)]
-          (lst2)
+        unfold[List(A)](lst1)[List(A)]
           (^x:A{^xs:List(A){cons[A](x)(append(xs)(lst2))}})
+          (lst2)
       }}
     }
   )
